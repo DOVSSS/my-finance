@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <h1>Тест вашего Firebase</h1>
+    <button onclick="test()">Тестировать</button>
+    <div id="result"></div>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRmRVB6IAwonTmMyZ08YibPmSRyVJqD3A",
+            authDomain: "familytreasury-24376.firebaseapp.com",
+            projectId: "familytreasury-24376",
+            storageBucket: "familytreasury-24376.firebasestorage.app",
+            messagingSenderId: "1060569127399",
+            appId: "1:1060569127399:web:aa86ce303893dfb3654542"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        
+        async function test() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Тестирую...</p>';
+            
+            try {
+                // 1. Тест входа
+                const auth = firebase.auth();
+                const userCredential = await auth.signInWithEmailAndPassword('has@gmail.com', 'has0808');
+                result.innerHTML += `<p>✅ Вход успешен! UID: ${userCredential.user.uid}</p>`;
+                
+                // 2. Тест Firestore
+                const db = firebase.firestore();
+                
+                // Проверяем коллекцию admins
+                const adminDoc = await db.collection('admins').doc(userCredential.user.uid).get();
+                
+                if (adminDoc.exists) {
+                    result.innerHTML += '<p>✅ Администратор найден в Firestore</p>';
+                } else {
+                    result.innerHTML += '<p>❌ Администратор НЕ найден в Firestore</p>';
+                    result.innerHTML += '<p>Нужно создать коллекцию "admins" с документом UID</p>';
+                }
+                
+            } catch (error) {
+                result.innerHTML += `<p style="color: red;">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
