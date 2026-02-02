@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box } from '@mui/material';
+import { Container, Box, Button } from '@mui/material';
+import { AdminPanelSettings as AdminIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../utils/firebase';
 import {
@@ -171,6 +172,27 @@ const HomePage = () => {
         totalMembers={totalMembers}
         collectedAmount={collectedAmount}
       />
+
+      {/* Кнопка вернуться в админку (только для админов) */}
+      {isAdmin && currentUser && (
+        <Box sx={{ mb: 2 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => window.location.hash = '#/admin'}
+            startIcon={<AdminIcon />}
+            size="small"
+            sx={{
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark'
+              }
+            }}
+          >
+            Вернуться в панель управления
+          </Button>
+        </Box>
+      )}
 
       <FamilyList
         families={families}

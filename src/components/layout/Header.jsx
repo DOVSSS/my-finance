@@ -14,8 +14,9 @@ import {
   Login as LoginIcon,
   AdminPanelSettings as AdminIcon,
   AccountBalanceWallet as WalletIcon,
-  Groups as GroupsIcon,
-  MonetizationOn as MonetizationOnIcon // ПРАВИЛЬНОЕ ИМЯ
+  CheckCircle as CheckIcon,
+  AttachMoney as MoneyIcon,
+  Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { getCurrentMonth } from '../../utils/dateUtils';
@@ -23,12 +24,13 @@ import { getCurrentMonth } from '../../utils/dateUtils';
 const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
   const { currentUser, isAdmin, logout } = useAuth();
   const currentMonth = getCurrentMonth();
+  const remainingCount = totalMembers - paidCount;
 
   return (
     <Paper 
       elevation={3}
       sx={{ 
-        p: { xs: 1.5, sm: 2 },
+        p: { xs: 1, sm: 1.5 },
         mb: 2,
         background: 'linear-gradient(135deg, #1976d2 0%, #2196f3 100%)',
         color: 'white',
@@ -38,50 +40,50 @@ const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: -50,
-          right: -50,
-          width: 150,
-          height: 150,
+          top: -40,
+          right: -40,
+          width: 120,
+          height: 120,
           background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
           borderRadius: '50%'
         }
       }}
     >
       {/* Верхняя часть с логотипом */}
-      <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+      <Box display="flex" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 1.5 }}>
         <Box>
           {/* Логотип ВАШТАРОЙ */}
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: 1,
-            mb: 0.5
+            gap: 0.5
           }}>
             <Box sx={{
-              width: 32,
-              height: 32,
+              width: 28,
+              height: 28,
               bgcolor: 'rgba(255,255,255,0.9)',
-              borderRadius: 2,
+              borderRadius: 1.5,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              boxShadow: '0 3px 8px rgba(0,0,0,0.1)'
             }}>
               <WalletIcon sx={{ 
                 color: '#1976d2',
-                fontSize: 20
+                fontSize: 16
               }} />
             </Box>
             <Typography 
-              variant="h4" 
+              variant="h5" 
               fontWeight="900"
               sx={{ 
-                textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
-                letterSpacing: '1px',
+                textShadow: '1px 1px 3px rgba(0,0,0,0.2)',
+                letterSpacing: '0.5px',
                 background: 'linear-gradient(45deg, #ffffff 30%, #e3f2fd 90%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
-                color: 'transparent'
+                color: 'transparent',
+                fontSize: { xs: '1.25rem', sm: '1.5rem' }
               }}
             >
               ВАШТАРОЙ
@@ -91,34 +93,36 @@ const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
           <Typography variant="caption" sx={{ 
             opacity: 0.9,
             display: 'block',
-            ml: 1
+            ml: 0.5,
+            fontSize: '0.7rem'
           }}>
-            Семейная финансовая система
+            Семейная казна
           </Typography>
         </Box>
         
         {/* Правая часть - пользователь и кнопки */}
-        <Box textAlign="right" sx={{ minWidth: 100 }}>
+        <Box textAlign="right">
           {currentUser ? (
-            <Box>
+            <Box display="flex" alignItems="center" gap={0.5}>
               {isAdmin && (
                 <Tooltip title="Администратор">
                   <Badge 
                     color="secondary" 
                     variant="dot"
-                    sx={{ mb: 0.5 }}
                   >
                     <Chip 
                       icon={<AdminIcon />}
-                      label="Админ"
+                      label=""
                       size="small"
                       sx={{ 
                         bgcolor: 'rgba(255,255,255,0.2)', 
                         color: 'white',
-                        fontSize: '0.7rem',
+                        minWidth: 32,
+                        height: 28,
                         '& .MuiChip-icon': {
                           color: '#ffeb3b',
-                          fontSize: 16
+                          fontSize: 14,
+                          ml: 0.5
                         }
                       }}
                     />
@@ -132,6 +136,8 @@ const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
                   sx={{ 
                     color: 'white', 
                     bgcolor: 'rgba(255,255,255,0.15)',
+                    width: 28,
+                    height: 28,
                     '&:hover': {
                       bgcolor: 'rgba(255,255,255,0.25)'
                     }
@@ -147,11 +153,14 @@ const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
                 variant="contained"
                 onClick={() => window.location.hash = '#/admin'}
                 size="small"
-                startIcon={<LoginIcon />}
                 sx={{ 
                   bgcolor: 'rgba(255,255,255,0.9)',
                   color: '#1976d2',
                   fontWeight: 'bold',
+                  fontSize: '0.75rem',
+                  px: 1,
+                  py: 0.25,
+                  minWidth: 'auto',
                   '&:hover': {
                     bgcolor: 'white'
                   }
@@ -166,160 +175,156 @@ const Header = ({ balance, paidCount, totalMembers, collectedAmount }) => {
       
       {/* Основной баланс */}
       <Box sx={{ 
-        mt: 2,
-        p: 2,
+        mb: 1.5,
+        p: 1.5,
         bgcolor: 'rgba(255,255,255,0.1)',
         borderRadius: 2,
-        backdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(8px)',
         border: '1px solid rgba(255,255,255,0.2)'
       }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
-            <Typography variant="caption" sx={{ opacity: 0.8 }}>
-              Общий баланс • {currentMonth}
+            <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.7rem' }}>
+              Баланс • {currentMonth}
             </Typography>
-            <Typography variant="h3" fontWeight="800" sx={{ mt: 0.5 }}>
+            <Typography variant="h4" fontWeight="800" sx={{ mt: 0.25, fontSize: { xs: '1.5rem', sm: '2rem' } }}>
               {balance.toLocaleString('ru-RU')} ₽
             </Typography>
           </Box>
           <Box sx={{
-            width: 60,
-            height: 60,
+            width: 48,
+            height: 48,
             bgcolor: 'rgba(255,255,255,0.9)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+            boxShadow: '0 3px 15px rgba(0,0,0,0.15)'
           }}>
-            <MonetizationOnIcon sx={{ 
+            <MoneyIcon sx={{ 
               color: '#4caf50',
-              fontSize: 32
+              fontSize: 24
             }} />
           </Box>
         </Box>
       </Box>
       
-      {/* Статистика */}
+      {/* Статистика в одном ряду */}
       <Box sx={{ 
-        mt: 2,
-        display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
-        gap: 1.5
+        display: 'flex',
+        justifyContent: 'space-between',
+        gap: 0.75
       }}>
         {/* Внесли */}
         <Box sx={{
-          p: 1.5,
+          flex: 1,
+          p: 1,
           bgcolor: 'rgba(76, 175, 80, 0.2)',
-          borderRadius: 2,
+          borderRadius: 1.5,
           textAlign: 'center',
-          border: '1px solid rgba(76, 175, 80, 0.3)'
+          border: '1px solid rgba(76, 175, 80, 0.3)',
+          minWidth: 0
         }}>
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            gap: 1,
-            mb: 0.5
+            gap: 0.5,
+            mb: 0.25
           }}>
-            <GroupsIcon sx={{ fontSize: 18, opacity: 0.9 }} />
-            <Typography variant="caption" fontWeight="medium">
+            <CheckIcon sx={{ fontSize: 14, opacity: 0.9 }} />
+            <Typography variant="caption" fontWeight="medium" sx={{ fontSize: '0.65rem' }}>
               Внесли
             </Typography>
           </Box>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1rem' }}>
             {paidCount}
             <Typography 
               component="span" 
               variant="caption" 
-              sx={{ opacity: 0.7, ml: 0.5 }}
+              sx={{ opacity: 0.7, ml: 0.25, fontSize: '0.7rem' }}
             >
-              / {totalMembers}
+              /{totalMembers}
             </Typography>
-          </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mt: 0.5 }}>
-            участников
           </Typography>
         </Box>
         
         {/* Собрано */}
         <Box sx={{
-          p: 1.5,
+          flex: 1,
+          p: 1,
           bgcolor: 'rgba(255, 193, 7, 0.2)',
-          borderRadius: 2,
+          borderRadius: 1.5,
           textAlign: 'center',
-          border: '1px solid rgba(255, 193, 7, 0.3)'
+          border: '1px solid rgba(255, 193, 7, 0.3)',
+          minWidth: 0
         }}>
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            gap: 1,
-            mb: 0.5
+            gap: 0.5,
+            mb: 0.25
           }}>
-            <MonetizationOnIcon sx={{ fontSize: 18, opacity: 0.9 }} />
-            <Typography variant="caption" fontWeight="medium">
+            <MoneyIcon sx={{ fontSize: 14, opacity: 0.9 }} />
+            <Typography variant="caption" fontWeight="medium" sx={{ fontSize: '0.65rem' }}>
               Собрано
             </Typography>
           </Box>
-          <Typography variant="h6" fontWeight="bold">
-            {collectedAmount.toLocaleString('ru-RU')} ₽
-          </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mt: 0.5 }}>
-            за месяц
+          <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1rem' }}>
+            {collectedAmount > 999 ? `${Math.round(collectedAmount/1000)}к` : collectedAmount} ₽
           </Typography>
         </Box>
         
         {/* Осталось */}
         <Box sx={{
-          p: 1.5,
+          flex: 1,
+          p: 1,
           bgcolor: 'rgba(244, 67, 54, 0.2)',
-          borderRadius: 2,
+          borderRadius: 1.5,
           textAlign: 'center',
-          border: '1px solid rgba(244, 67, 54, 0.3)'
+          border: '1px solid rgba(244, 67, 54, 0.3)',
+          minWidth: 0
         }}>
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            gap: 1,
-            mb: 0.5
+            gap: 0.5,
+            mb: 0.25
           }}>
-            <GroupsIcon sx={{ fontSize: 18, opacity: 0.9 }} />
-            <Typography variant="caption" fontWeight="medium">
+            <CancelIcon sx={{ fontSize: 14, opacity: 0.9 }} />
+            <Typography variant="caption" fontWeight="medium" sx={{ fontSize: '0.65rem' }}>
               Осталось
             </Typography>
           </Box>
-          <Typography variant="h6" fontWeight="bold">
-            {totalMembers - paidCount}
-          </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mt: 0.5 }}>
-            внести
+          <Typography variant="h6" fontWeight="bold" sx={{ fontSize: '1rem' }}>
+            {remainingCount}
           </Typography>
         </Box>
       </Box>
       
-      {/* Прогресс бар */}
-      <Box sx={{ mt: 2 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-          <Typography variant="caption" sx={{ opacity: 0.8 }}>
-            Прогресс сбора
+      {/* Прогресс бар - компактный */}
+      <Box sx={{ mt: 1 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 0.25 }}>
+          <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.65rem' }}>
+            Прогресс
           </Typography>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" fontWeight="bold" sx={{ fontSize: '0.65rem' }}>
             {totalMembers > 0 ? Math.round((paidCount / totalMembers) * 100) : 0}%
           </Typography>
         </Box>
         <Box sx={{
-          height: 6,
+          height: 4,
           bgcolor: 'rgba(255,255,255,0.1)',
-          borderRadius: 3,
+          borderRadius: 2,
           overflow: 'hidden'
         }}>
           <Box sx={{
             height: '100%',
             width: `${totalMembers > 0 ? (paidCount / totalMembers) * 100 : 0}%`,
             background: 'linear-gradient(90deg, #4caf50 0%, #8bc34a 100%)',
-            borderRadius: 3,
+            borderRadius: 2,
             transition: 'width 0.5s ease'
           }} />
         </Box>
