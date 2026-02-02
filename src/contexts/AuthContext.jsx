@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, db } from '../firebase';
+import { auth } from '../utils/firebase';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { checkAdminStatus } from '../utils/auth';
 
 const AuthContext = createContext();
 
@@ -17,14 +17,8 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
       
       if (user) {
-        // Проверяем, является ли пользователь администратором
-        try {
-          const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-          setIsAdmin(adminDoc.exists());
-        } catch (error) {
-          console.error('Ошибка проверки прав:', error);
-          setIsAdmin(false);
-        }
+        const adminStatus = await checkAdminStatus(user.uid);
+        setIsAdmin(adminStatus);
       } else {
         setIsAdmin(false);
       }
