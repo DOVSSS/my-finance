@@ -207,7 +207,9 @@ const AdminPage = () => {
           onAddMember={addMember}
           onTogglePayment={togglePayment}
           onWithdraw={handleWithdrawal}
+          
         />
+        
       </Container>
     );
   }

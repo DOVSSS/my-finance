@@ -34,6 +34,9 @@ const AdminPanel = ({
 }) => {
   return (
     <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+              
+
+
       <Box sx={{ mb: 2 }}>
         <Button
           fullWidth
@@ -45,6 +48,8 @@ const AdminPanel = ({
         >
           На главную
         </Button>
+
+
         
         <Tabs 
           value={activeTab} 
@@ -56,6 +61,7 @@ const AdminPanel = ({
           <Tab label="Отметить взносы" />
           <Tab label="Списать средства" />
           <Tab label="История" />
+          
         </Tabs>
       </Box>
 
@@ -93,6 +99,23 @@ const AdminPanel = ({
       {activeTab === 3 && (
         <TransactionList transactions={transactions} isAdmin={true} />
       )}
+
+
+
+      <Button 
+  variant="outlined" 
+  color="warning"
+  onClick={async () => {
+    if (window.confirm('Сбросить все статусы оплаты для нового месяца?')) {
+      await forceResetAllPayments();
+      alert('Статусы сброшены!');
+    }
+  }}
+  size="small"
+  sx={{ mt: 2 }}
+>
+  Сбросить все взносы
+</Button>
     </Paper>
   );
 };
