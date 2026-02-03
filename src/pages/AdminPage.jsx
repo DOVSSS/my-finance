@@ -20,7 +20,9 @@ import {
   doc,
   onSnapshot,
   query,
-  orderBy
+  orderBy,
+  deleteDoc,
+  writeBatch 
 } from 'firebase/firestore';
 import AdminPanel from '../components/layout/AdminPanel';
 
@@ -84,6 +86,83 @@ const AdminPage = () => {
       setLoading(false);
     }
   };
+
+  // Добавьте эти функции в AdminPage.jsx
+
+const deleteFamily = async (familyId) => {
+  try {
+    // Удаляем семью из Firestore
+    await deleteDoc(doc(db, 'families', familyId));
+    
+    // Добавляем системное уведомление
+    await addDoc(collection(db, 'transactions'), {
+      type: 'system',
+      amount: 0,
+      reason: 'Удаление семьи',
+      description: 'Семья и все участники удалены',
+      date: new Date(),
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log('✅ Семья удалена');
+    
+  } catch (error) {
+    console.error('❌ Ошибка при удалении семьи:', error);
+    alert('Ошибка при удалении семьи: ' + error.message);
+  }
+};
+
+const deleteMember = async (familyId, memberIndex) => {
+  try {
+    const familyRef = doc(db, 'families', familyId);
+    const family = families.find(f => f.id === familyId);
+    
+    if (!family || !family.members) {
+      console.error('Семья или участник не найдены');
+      return;
+    }
+    
+    const memberToDelete = family.members[memberIndex];
+    
+    // Удаляем участника из массива
+    const updatedMembers = family.members.filter((_, index) => index !== memberIndex);
+    
+    // Удаляем все транзакции этого участника
+    const transactionsRef = collection(db, 'transactions');
+    const transactionsSnapshot = await getDocs(transactionsRef);
+    const batch = writeBatch(db);
+    
+    transactionsSnapshot.docs.forEach(transactionDoc => {
+      const transaction = transactionDoc.data();
+      if (transaction.memberName === memberToDelete.name) {
+        batch.delete(transactionDoc.ref);
+      }
+    });
+    
+    // Обновляем семью и удаляем транзакции
+    await Promise.all([
+      updateDoc(familyRef, { members: updatedMembers }),
+      batch.commit()
+    ]);
+    
+    // Добавляем системное уведомление
+    await addDoc(collection(db, 'transactions'), {
+      type: 'system',
+      amount: 0,
+      reason: 'Удаление участника',
+      description: `Участник "${memberToDelete.name}" удалён`,
+      date: new Date(),
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log(`✅ Участник "${memberToDelete.name}" удалён`);
+    
+  } catch (error) {
+    console.error('❌ Ошибка при удалении участника:', error);
+    alert('Ошибка при удалении участника: ' + error.message);
+  }
+};
+
 
   // Функции для админ-панели
   const addFamily = async () => {
@@ -193,6 +272,8 @@ const AdminPage = () => {
           transactions={transactions}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+           onDeleteFamily={deleteFamily}
+           onDeleteMember={deleteMember}
           newFamilyName={newFamilyName}
           setNewFamilyName={setNewFamilyName}
           newMemberName={newMemberName}

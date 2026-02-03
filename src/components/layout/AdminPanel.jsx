@@ -30,7 +30,9 @@ const AdminPanel = ({
   onAddFamily,
   onAddMember,
   onTogglePayment,
-  onWithdraw
+  onWithdraw,
+  onDeleteFamily, 
+  onDeleteMember,
 }) => {
   return (
     <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
@@ -76,6 +78,8 @@ const AdminPanel = ({
           setNewMemberName={setNewMemberName}
           selectedFamily={selectedFamily}
           setSelectedFamily={setSelectedFamily}
+           onDeleteFamily={onDeleteFamily} // ПЕРЕДАЙТЕ В FamilyManager
+      onDeleteMember={onDeleteMember} 
         />
       )}
 
