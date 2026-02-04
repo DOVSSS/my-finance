@@ -35,6 +35,7 @@ const AdminPanel = ({
   onWithdraw,
   onDeleteFamily, 
   onDeleteMember,
+    onResetAllPayments,
 }) => {
   return (
     <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
@@ -53,7 +54,18 @@ const AdminPanel = ({
           На главную
         </Button>
 
-
+           {onResetAllPayments && (
+          <Button
+            fullWidth
+            variant="outlined"
+            color="warning"
+            onClick={onResetAllPayments}
+            size="small"
+            sx={{ mb: 2 }}
+          >
+            🔄 Сбросить все статусы оплаты
+          </Button>
+        )}
         
         <Tabs 
           value={activeTab} 
@@ -108,20 +120,6 @@ const AdminPanel = ({
 
 
 
-      <Button 
-  variant="outlined" 
-  color="warning"
-  onClick={async () => {
-    if (window.confirm('Сбросить все статусы оплаты для нового месяца?')) {
-      await forceResetAllPayments();
-      alert('Статусы сброшены!');
-    }
-  }}
-  size="small"
-  sx={{ mt: 2 }}
->
-  Сбросить все взносы
-</Button>
     </Paper>
   );
 };

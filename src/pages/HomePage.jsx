@@ -28,11 +28,7 @@ const HomePage = () => {
   const [expandedFamily, setExpandedFamily] = useState(null);
 
   useEffect(() => {
-     const resetMonthlyStatus = async () => {
-      await checkAndResetMonthlyStatus();
-    };
     
-    resetMonthlyStatus();
     // Загрузка транзакций
     const transactionsQuery = query(collection(db, 'transactions'), orderBy('date', 'desc'));
     const unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {

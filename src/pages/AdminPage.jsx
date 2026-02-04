@@ -26,6 +26,7 @@ import {
    getDocs, // ДОБАВЬТЕ ЭТО
  
 } from 'firebase/firestore';
+import { resetAllPayments } from '../utils/manualReset';
 import AdminPanel from '../components/layout/AdminPanel';
 
 const AdminPage = () => {
@@ -45,6 +46,26 @@ const AdminPage = () => {
   const [selectedFamily, setSelectedFamily] = useState('');
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [withdrawalReason, setWithdrawalReason] = useState('');
+
+
+  const handleResetAllPayments = async () => {
+  if (!window.confirm('Сбросить ВСЕ статусы оплаты?\n\nЭто обнулит отметки "внёс" у всех участников.')) {
+    return;
+  }
+  
+  try {
+    const result = await resetAllPayments();
+    
+    if (result.success) {
+      alert(`✅ ${result.message}`);
+    } else {
+      alert(`❌ ${result.message}`);
+    }
+    
+  } catch (error) {
+    alert('Ошибка при сбросе: ' + error.message);
+  }
+};
 
   useEffect(() => {
     if (currentUser && isAdmin) {
@@ -262,6 +283,7 @@ const deleteMember = async (familyId, memberIndex) => {
       <Container maxWidth="lg" sx={{ p: 1, pb: 4 }}>
         <AdminPanel
           families={families}
+          onResetAllPayments={handleResetAllPayments}
           transactions={transactions}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
