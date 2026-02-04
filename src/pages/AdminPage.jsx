@@ -22,7 +22,9 @@ import {
   query,
   orderBy,
   deleteDoc,
-  writeBatch 
+  writeBatch,
+   getDocs, // ДОБАВЬТЕ ЭТО
+ 
 } from 'firebase/firestore';
 import AdminPanel from '../components/layout/AdminPanel';
 
@@ -114,55 +116,46 @@ const deleteFamily = async (familyId) => {
 
 const deleteMember = async (familyId, memberIndex) => {
   try {
-    const familyRef = doc(db, 'families', familyId);
     const family = families.find(f => f.id === familyId);
     
-    if (!family || !family.members) {
-      console.error('Семья или участник не найдены');
+    if (!family || !family.members || !family.members[memberIndex]) {
+      console.error('Участник не найден');
       return;
     }
     
-    const memberToDelete = family.members[memberIndex];
+    const memberName = family.members[memberIndex].name;
     
-    // Удаляем участника из массива
+    // Подтверждение
+    if (!window.confirm(`Удалить участника "${memberName}"?`)) {
+      return;
+    }
+    
+    const familyRef = doc(db, 'families', familyId);
+    
+    // Создаем новый массив без удаляемого участника
     const updatedMembers = family.members.filter((_, index) => index !== memberIndex);
     
-    // Удаляем все транзакции этого участника
-    const transactionsRef = collection(db, 'transactions');
-    const transactionsSnapshot = await getDocs(transactionsRef);
-    const batch = writeBatch(db);
-    
-    transactionsSnapshot.docs.forEach(transactionDoc => {
-      const transaction = transactionDoc.data();
-      if (transaction.memberName === memberToDelete.name) {
-        batch.delete(transactionDoc.ref);
-      }
-    });
-    
-    // Обновляем семью и удаляем транзакции
-    await Promise.all([
-      updateDoc(familyRef, { members: updatedMembers }),
-      batch.commit()
-    ]);
+    // Обновляем документ семьи
+    await updateDoc(familyRef, { members: updatedMembers });
     
     // Добавляем системное уведомление
     await addDoc(collection(db, 'transactions'), {
       type: 'system',
       amount: 0,
       reason: 'Удаление участника',
-      description: `Участник "${memberToDelete.name}" удалён`,
+      description: `Участник "${memberName}" удалён из семьи "${family.name}"`,
       date: new Date(),
       timestamp: new Date().toISOString()
     });
     
-    console.log(`✅ Участник "${memberToDelete.name}" удалён`);
+    console.log(`✅ Участник "${memberName}" удалён`);
+    alert(`Участник "${memberName}" успешно удалён`);
     
   } catch (error) {
     console.error('❌ Ошибка при удалении участника:', error);
     alert('Ошибка при удалении участника: ' + error.message);
   }
 };
-
 
   // Функции для админ-панели
   const addFamily = async () => {
