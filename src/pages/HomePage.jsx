@@ -18,7 +18,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import Header from '../components/layout/Header';
 import FamilyList from '../components/families/FamilyList';
 import TransactionList from '../components/transactions/TransactionList';
-import { checkAndResetMonthlyStatus } from '../utils/monthlyReset';
+
 const HomePage = () => {
   const { currentUser, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
